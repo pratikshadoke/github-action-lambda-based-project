@@ -10,25 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Show Repository Structure
-        run: |
-          pwd
-          ls -la
-          find . -maxdepth 2 -type f
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install Dependencies
+      - name: Install dependencies
+        working-directory: serverless-task-api
         run: npm install
 
-      - name: Create Lambda ZIP
-        run: zip -r lambda.zip . -x ".git/*" ".github/*"
+      - name: Create deployment package
+        working-directory: serverless-task-api
+        run: |
+          zip -r lambda.zip . \
+            -x ".git/*" \
+               ".github/*"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -38,6 +35,7 @@ jobs:
           aws-region: us-east-2
 
       - name: Deploy Lambda
+        working-directory: serverless-task-api
         run: |
           aws lambda update-function-code \
             --function-name task-api \
