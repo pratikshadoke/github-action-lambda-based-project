@@ -6,17 +6,20 @@ on:
       - main
 
 jobs:
-
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Show Repository Structure
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 2 -type f
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -24,9 +27,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Create Zip
-        run: |
-          zip -r lambda.zip .
+      - name: Create Lambda ZIP
+        run: zip -r lambda.zip . -x ".git/*" ".github/*"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
